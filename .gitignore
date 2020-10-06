@@ -1,1 +1,6 @@
-data/
+data/*/*.fasta
+data/*/*.fa
+data/*/*.fastq
+data/*/*.fq
+counts/
+.snakemake/
