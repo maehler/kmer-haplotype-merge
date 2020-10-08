@@ -2,5 +2,7 @@ data/*/*.fasta
 data/*/*.fa
 data/*/*.fastq
 data/*/*.fq
+bin/
+src/identify_homozygous_kmers/identify_homozygous_kmers
 counts/
 .snakemake/

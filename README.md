@@ -4,6 +4,7 @@
 
 - [Snakemake](https://snakemake.readthedocs.io/)
 - [SRA toolkit](https://github.com/ncbi/sra-tools)
+- [Conda (miniconda)](https://docs.conda.io/en/latest/miniconda.html)
 
 ## Data
 

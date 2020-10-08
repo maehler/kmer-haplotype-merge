@@ -13,3 +13,13 @@ rule jellyfish_count:
             -o {output} \\
             {input}
         """
+
+rule executables:
+    output: 'bin/identify_homozygous_kmers'
+    conda: '../envs/jellyfish.yaml'
+    shell:
+        """
+        export PKG_CONFIG_PATH=$CONDA_PREFIX/lib/pkgconfig
+        cd src/identify_homozygous_kmers
+        make install
+        """
