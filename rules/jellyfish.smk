@@ -28,7 +28,9 @@ rule jellyfish_histo:
 
 rule plot_jellyfish_histo:
     input: 'results/{species}/{prefix}.{ext}_{k}mer-hist.txt'
-    output: 'results/{species}/{prefix}.{ext}_{k}mer-hist.png'
+    output:
+        hist_plot='results/{species}/{prefix}.{ext}_{k}mer-hist.png',
+        hom_limits='results/{species}/{prefix}.{ext}_{k}mer-hom-limits.txt'
     script: '../scripts/plot_jellyfish_histo.R'
 
 rule executables:
