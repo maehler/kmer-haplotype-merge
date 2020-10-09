@@ -1,0 +1,3 @@
+athaliana:
+  assembly: 'data/athaliana/genome.p-ctg.fa'
+  short_reads: 'data/athaliana/illumina_reads.fastq'

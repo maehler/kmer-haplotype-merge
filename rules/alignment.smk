@@ -1,7 +1,7 @@
 rule index_bowtie:
     input:
-        fasta='data/{species}/{prefix}.{ext}'
-    output: multiext('alignments/reference/{species}_{prefix}.{ext}', \
+        fasta=lambda wildcards: config[wildcards.dataset]['assembly']
+    output: multiext('reference/{dataset}/assembly', \
         '.1.ebwt', '.2.ebwt', '.rev.1.ebwt', '.rev.2.ebwt')
     conda: '../envs/bowtie.yaml'
     threads: 4
@@ -17,10 +17,10 @@ rule index_bowtie:
 
 rule align_kmers:
     input:
-        kmers='results/{species}/{read_prefix}.{read_ext}_{asm_prefix}.{asm_ext}_{k}mer_homozygous.fasta',
-        reference=multiext('alignments/reference/{species}_{asm_prefix}.{asm_ext}',
+        kmers='results/{dataset}/short_reads_assembly_{k}mer_homozygous.fasta',
+        reference=multiext('reference/{dataset}/assembly',
             '.1.ebwt', '.2.ebwt', '.rev.1.ebwt', '.rev.2.ebwt')
-    output: 'alignments/{species}/{read_prefix}.{read_ext}_{asm_prefix}.{asm_ext}_{k}mer_alignments.bam'
+    output: 'alignments/{dataset}/short_reads_assembly_{k}mer_alignments.bam'
     conda: '../envs/bowtie.yaml'
     threads: 4
     shell:
