@@ -24,7 +24,9 @@ rule extract_kmer_blocks:
     script: '../scripts/extract_kmer_blocks.py'
 
 rule plot_linked_contigs:
-    input: 'results/{dataset}/short_reads_assembly_{k}mer_blocks_maxdist{max_distance}.tsv'
+    input:
+        kmer_blocks='results/{dataset}/short_reads_assembly_{k}mer_blocks_maxdist{max_distance}.tsv',
+        reference_index=lambda wildcards: '{0}.fai'.format(config[wildcards.dataset]['assembly'])
     output: 'results/{dataset}/short_reads_assembly_{k}mer_maxdist{max_distance}_plots/{contig1}_{contig2}.png'
     conda: '../envs/r_graphs.yaml'
     script: '../scripts/plot_linked_contigs.R'
