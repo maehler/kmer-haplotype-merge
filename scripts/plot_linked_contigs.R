@@ -22,8 +22,8 @@ subset_df <- kmer_blocks %>%
 x_coords <- subset_df %>%
   rename(tmp_target_start = target_start,
          tmp_target_end = target_end) %>% 
-  mutate(target_start = ifelse(same_direction, tmp_target_start, tmp_target_end),
-         target_end = ifelse(same_direction, tmp_target_end, tmp_target_start)) %>%
+  mutate(target_start = ifelse(same_direction, tmp_target_end, tmp_target_start),
+         target_end = ifelse(same_direction, tmp_target_start, tmp_target_end)) %>%
   select(source_start, source_end, target_start, target_end, poly_end) %>%
   as.matrix %>% t %>% as.vector
 
