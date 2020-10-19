@@ -58,13 +58,15 @@ def extract_candidates(graphfile, k, max_distance):
 
     with open(graphfile) as f:
         for line in f:
-            contig_pair = line.strip().split(' ')[:2]
+            contig_pair = line.strip().split()[:2]
+            if contig_pair[0] == contig_pair[1]:
+                continue
             if contig_pair != current_pair:
                 if current_pair is not None:
                     kmer_blocks[tuple(current_pair)] = process_pairs(current_pair[0], current_pair[1], pair_alignments, k, max_distance)
                 current_pair = contig_pair
                 pair_alignments = []
-            metadata = line.strip().split(' ')[2:]
+            metadata = line.strip().split()[2:]
             pair_alignments.append(
                 {
                     'name': metadata[0],

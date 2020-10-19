@@ -1,4 +1,3 @@
-import networkx as nx
 import pysam
 import sys
 
@@ -23,45 +22,36 @@ def construct_edge(aln):
         }
     )
 
-def walk_bamfile(fname, batch_size=1000):
+def walk_bamfile(fname):
     bam = pysam.AlignmentFile(fname, 'rb', require_index=False)
-
-    g = nx.MultiGraph()
-    edge_batch = []
 
     current_kmer = None
     current_kmer_aln = []
 
     for aln in bam:
-        if len(edge_batch) >= batch_size:
-            g.add_edges_from(edge_batch)
-            edge_batch = []
         if current_kmer != aln.query_name:
             if current_kmer is not None and len(current_kmer_aln) != 2:
                 print(f'error: found {len(current_kmer_aln)} alignments '
                       f'for {current_kmer}, should be 2', file=sys.stderr)
                 sys.exit(1)
             if current_kmer is not None:
-                edge_batch.append(construct_edge(current_kmer_aln))
+                yield construct_edge(current_kmer_aln)
             current_kmer = aln.query_name
             current_kmer_aln = []
         current_kmer_aln.append(aln)
-
-    # Add the last batch of edges
-    g.add_edges_from(edge_batch)
-
-    return g
 
 def main():
     bamfile = snakemake.input[0]
     graphfile = snakemake.output[0]
 
-    contig_graph = walk_bamfile(bamfile)
-    # nx.write_graphml(contig_graph, graphfile)
-    nx.write_edgelist(contig_graph, graphfile,
-        data=['label', 'source_position', 'target_position',
-            'source_direction', 'target_direction'])
-    print(f'{contig_graph.number_of_nodes()} nodes, {contig_graph.number_of_edges()} edges')
+    edges = walk_bamfile(bamfile)
+    with open(graphfile, 'w') as f:
+        for source, target, attr in edges:
+            print('\t'.join(map(str, (source, target, attr['label'],
+                             attr['source_position'],
+                             attr['target_position'],
+                             attr['source_direction'],
+                             attr['target_direction']))), file=f)
 
 if __name__ == '__main__':
     main()
