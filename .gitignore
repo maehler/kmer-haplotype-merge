@@ -9,3 +9,5 @@ results/
 reference/
 alignments/
 .snakemake/
+.Rproj.user
+kmer_haplotype_merge.Rproj

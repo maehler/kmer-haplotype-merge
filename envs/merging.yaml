@@ -1,0 +1,9 @@
+name: contig_merging
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - pysam=0.16
+  - networkx=2.5
+  - matplotlib=3.3
