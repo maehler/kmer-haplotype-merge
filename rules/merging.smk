@@ -10,7 +10,9 @@ rule sort_contig_graph:
     shell: 'sort -k1,2 {input} > {output}'
 
 rule contig_graph_overview:
-    input: 'results/{dataset}/short_reads_assembly_{k}mer_contig_graph.edgelist'
+    input:
+        edgelist='results/{dataset}/short_reads_assembly_{k}mer_contig_graph_sorted.edgelist',
+        reference_index=lambda wildcards: '{0}.fai'.format(config[wildcards.dataset]['assembly'])
     output: 'results/{dataset}/short_reads_assembly_{k}mer_contig_graph_overview.png'
     conda: '../envs/r_graphs.yaml'
     script: '../scripts/contig_graph_overview.R'

@@ -1,7 +1,7 @@
 library(tidyverse)
 library(igraph)
 
-contig_lengths <- read_tsv("data/athaliana/genome.p-ctg.fa.fai",
+contig_lengths <- read_tsv(snakemake@input[["reference_index"]],
                            col_names = c("contig", "length"),
                            col_types = "cd---")
 
@@ -26,6 +26,7 @@ plot_contig_graph <- function(e, plot_filename, ...) {
        layout = layout,
        vertex.size = scaled_d,
        vertex.color = node_meta$colour,
+       vertex.label = NA,
        edge.color = rgb(0, 0, 0, 0.3),
        edge.width = scaled_edge_width)
 
@@ -44,7 +45,7 @@ plot_contig_graph <- function(e, plot_filename, ...) {
   invisible(g)
 }
 
-full_edge_df <- read_delim(snakemake@input[[1]], delim = " ",
+full_edge_df <- read_tsv(snakemake@input[["edgelist"]],
     col_names = c("source", "target", "kmer",
         "source_position", "target_position",
         "source_direction", "target_direction"),
