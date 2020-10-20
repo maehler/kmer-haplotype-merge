@@ -26,8 +26,10 @@ def process_pairs(source, target, alignments, k, max_difference):
         target_end = target_position + k if target_direction == '+' else target_position
 
         if 'source_end' in blocks[block]:
-            source_block_size = blocks[block]['source_end'] - blocks[block]['source_start']
-            target_block_size = blocks[block]['target_end'] - blocks[block]['target_start']
+            source_block_size = max(blocks[block]['source_end'], source_end) - \
+                    min(blocks[block]['source_start'], source_start)
+            target_block_size = max(blocks[block]['target_end'], target_end) - \
+                    min(blocks[block]['target_start'], target_start)
             block_size_diff = max(source_block_size, target_block_size) / \
                     min(source_block_size, target_block_size)
         else:
