@@ -19,14 +19,14 @@ rule contig_graph_overview:
 
 rule extract_kmer_blocks:
     input: 'results/{dataset}/short_reads_assembly_{k}mer_contig_graph_sorted.edgelist'
-    output: 'results/{dataset}/short_reads_assembly_{k}mer_blocks_maxdist{max_distance}.tsv'
+    output: 'results/{dataset}/short_reads_assembly_{k}mer_blocks_maxdiff{max_difference}.tsv'
     conda: '../envs/merging.yaml'
     script: '../scripts/extract_kmer_blocks.py'
 
 rule plot_linked_contigs:
     input:
-        kmer_blocks='results/{dataset}/short_reads_assembly_{k}mer_blocks_maxdist{max_distance}.tsv',
+        kmer_blocks='results/{dataset}/short_reads_assembly_{k}mer_blocks_maxdiff{max_difference}.tsv',
         reference_index=lambda wildcards: '{0}.fai'.format(config[wildcards.dataset]['assembly'])
-    output: 'results/{dataset}/short_reads_assembly_{k}mer_maxdist{max_distance}_plots/{contig1}_{contig2}.png'
+    output: 'results/{dataset}/short_reads_assembly_{k}mer_maxdiff{max_difference}_plots/{contig1}_{contig2}.png'
     conda: '../envs/r_graphs.yaml'
     script: '../scripts/plot_linked_contigs.R'

@@ -1,12 +1,11 @@
 from collections import defaultdict
 
-def process_pairs(source, target, alignments, k, max_distance=None):
+def process_pairs(source, target, alignments, k, max_difference):
     sorted_alignments = sorted(alignments, key=lambda x: x['source_position'])
     target_positions = [x['target_position'] for x in sorted_alignments]
 
     prev_increasing = None
     prev_same_strand = None
-    prev_target_end = None
     block = 1
 
     blocks = defaultdict(dict)
@@ -26,16 +25,21 @@ def process_pairs(source, target, alignments, k, max_distance=None):
         target_start = target_position if target_direction == '+' else target_position - k
         target_end = target_position + k if target_direction == '+' else target_position
 
+        if 'source_end' in blocks[block]:
+            source_block_size = blocks[block]['source_end'] - blocks[block]['source_start']
+            target_block_size = blocks[block]['target_end'] - blocks[block]['target_start']
+            block_size_diff = max(source_block_size, target_block_size) / \
+                    min(source_block_size, target_block_size)
+        else:
+            block_size_diff = 1
+
         same_strand = source_direction == target_direction
         if prev_same_strand is None:
             prev_same_strand = same_strand
 
-        if prev_target_end is None:
-            prev_target_end = target_end
-
         if increasing != prev_increasing or \
                 same_strand != prev_same_strand or \
-                target_start - prev_target_end > max_distance:
+                block_size_diff > 1.5:
             block += 1
 
         blocks[block]['source_start'] = min(blocks[block].get('source_start', source_start), source_start)
@@ -46,11 +50,10 @@ def process_pairs(source, target, alignments, k, max_distance=None):
 
         prev_increasing = increasing
         prev_same_strand = same_strand
-        prev_target_end = target_end
 
     return blocks
 
-def extract_candidates(graphfile, k, max_distance):
+def extract_candidates(graphfile, k, max_difference):
     current_pair = None
     pair_alignments = []
 
@@ -63,7 +66,9 @@ def extract_candidates(graphfile, k, max_distance):
                 continue
             if contig_pair != current_pair:
                 if current_pair is not None:
-                    kmer_blocks[tuple(current_pair)] = process_pairs(current_pair[0], current_pair[1], pair_alignments, k, max_distance)
+                    kmer_blocks[tuple(current_pair)] = process_pairs(
+                        current_pair[0], current_pair[1],
+                        pair_alignments, k, max_difference)
                 current_pair = contig_pair
                 pair_alignments = []
             metadata = line.strip().split()[2:]
@@ -83,9 +88,9 @@ def main():
     graphfile = snakemake.input[0]
     output = snakemake.output[0]
     k = int(snakemake.wildcards['k'])
-    max_distance = int(snakemake.wildcards['max_distance'])
+    max_difference = float(snakemake.wildcards['max_difference'])
 
-    kmer_blocks = extract_candidates(graphfile, k, max_distance)
+    kmer_blocks = extract_candidates(graphfile, k, max_difference)
 
     with open(output, 'w') as f:
         print('\t'.join(('source', 'target', 'source_start', 'source_end',
